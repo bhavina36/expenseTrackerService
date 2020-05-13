@@ -1,8 +1,10 @@
 package com.project.expensetracker.service;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -20,13 +22,17 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tomcat.util.http.fileupload.ParameterParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.handler.UserRoleAuthorizationInterceptor;
 
 import com.project.expensetracker.data.ExpenseRepository;
 import com.project.expensetracker.entity.CategoryLabel;
+import com.project.expensetracker.entity.Customer;
 import com.project.expensetracker.entity.Expense;
 import com.project.expensetracker.errorhandler.ResponseObject;
 import com.project.expensetracker.util.CategoryUtil;
@@ -170,17 +176,17 @@ public class ExpenseServiceImpl implements ExpenseService {
 		return obj;
 	}
 
-	public ResponseObject listAllExpense(String userId) {
+	public ResponseObject listAllExpense(String token) {
 		
 		ResponseObject obj = new ResponseObject();
 		
-		if (userId != null) {
+		if (token != null) {	 
 
-			String emailId = userService.findEmailId(userId);
+			Optional<User> customer = userService.findByToken(token);		
 
-			if (emailId != null) {
+			if (!customer.isEmpty()) {				
 
-				List<Expense> listExpense = expenseRepo.findExpenseByEmailId(emailId);
+				List<Expense> listExpense = expenseRepo.findExpenseByEmailId(customer.get().getUsername());
 
 				if (!listExpense.isEmpty()) {
 					
@@ -201,17 +207,17 @@ public class ExpenseServiceImpl implements ExpenseService {
 	}
 
 	@Override
-	public ResponseObject listExpenseBasedOnCategory(String userId, String categoryName) {
+	public ResponseObject listExpenseBasedOnCategory(String token, String categoryName) {
 		
 		ResponseObject obj = new ResponseObject();
 
-		if (categoryName != null && userId != null) {
+		if (categoryName != null && token != null) {
+					
+			Optional<User> customer = userService.findByToken(token);					
 
-			String emailId = userService.findEmailId(userId);
+			if (!customer.isEmpty()) {
 
-			if (emailId != null) {
-
-				List<Expense> listExpense = expenseRepo.findExpenseByCategory(emailId, categoryName);
+				List<Expense> listExpense = expenseRepo.findExpenseByCategory(customer.get().getUsername(), categoryName);
 
 				if (!listExpense.isEmpty()) {
 					
@@ -231,7 +237,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 	}
 
 	@Override
-	public ResponseObject findPercentageOfCategory(String userId) {
+	public ResponseObject findPercentageOfCategory(String token) {
 		
 		ResponseObject obj = new ResponseObject();
 
@@ -245,9 +251,9 @@ public class ExpenseServiceImpl implements ExpenseService {
 		categoryPercentageTracker.put(CategoryLabel.SHOPPING.toString(), 0);
 		categoryPercentageTracker.put(CategoryLabel.TRAVEL.toString(), 0);
 
-		if (userId != null) {
+		if (token != null) {
 
-			List<Expense> listExpense = (List<Expense>) listAllExpense(userId).getResponse();
+			List<Expense> listExpense = (List<Expense>) listAllExpense(token).getResponse();
 
 			if(listExpense != null) {
 			int listSize = listExpense.size();

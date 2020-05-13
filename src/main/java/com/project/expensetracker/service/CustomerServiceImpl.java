@@ -3,6 +3,7 @@ package com.project.expensetracker.service;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -23,11 +24,7 @@ public class CustomerServiceImpl implements CustomerService {
 	@Autowired
 	private CustomerRepository userRepo;
 	
-	/*
-	 * @Autowired private SecurityService securityService;
-	 */
 	
-		
 	@Override
 	public ResponseObject addUser(Customer user) {
 		
@@ -125,9 +122,9 @@ public class CustomerServiceImpl implements CustomerService {
 			  } 
 		  }
 		
-		 responseObj.setResponse(null);  
+	    responseObj.setResponse(null);  
 		responseObj.setMessage("Invalid Username and password, Please try again!");
-		responseObj.setStatusCode(HttpStatus.UNAUTHORIZED.value());
+		responseObj.setStatusCode(HttpStatus.FORBIDDEN.value());
 
 		return responseObj;
 
@@ -138,6 +135,7 @@ public class CustomerServiceImpl implements CustomerService {
 		
 		ResponseObject responseObj = new ResponseObject();
 		
+		 token= StringUtils.removeStart(token, "Bearer").trim();
 		Customer getCustomerByToken = userRepo.findByToken(token);
 		
 		if(getCustomerByToken != null) {

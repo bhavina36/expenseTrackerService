@@ -23,7 +23,7 @@ import com.project.expensetracker.service.CustomerService;
 import com.project.expensetracker.util.HttpStatusUtil;
 
 @RestController
-@RequestMapping("/Auth")
+@RequestMapping("/auth")
 @CrossOrigin
 public class CustomerController {
 
@@ -48,7 +48,6 @@ public class CustomerController {
 	@ResponseBody
 	public ResponseEntity<ResponseObject> login(@RequestBody Customer user) {
 		
-		//String tempPassword = "$2a$10$YspLQ7Kyr1mL0dWunJTw5.5fpeRX1VExSbrig4m.CGW1Mv1yir7OC";
 		
 		ResponseObject obj =  userService.login(user.getEmail(), user.getPassword());
 		
