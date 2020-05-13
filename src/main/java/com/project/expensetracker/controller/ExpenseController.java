@@ -23,15 +23,14 @@ import com.project.expensetracker.util.HttpStatusUtil;
 
 @RestController
 @RequestMapping("/expense")
-@CrossOrigin
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ExpenseController {
 	
 	@Autowired
 	private ExpenseServiceImpl expenseService;
 		
 	@RequestMapping(value= "/addExpense", method = RequestMethod.POST)
-	public ResponseEntity<ResponseObject> addExpense(@RequestBody Expense expense) {	
-		
+	public ResponseEntity<ResponseObject> addExpense(@RequestBody Expense expense) {			
 		
       ResponseObject obj = expenseService.addExpense(expense);
       
@@ -62,24 +61,24 @@ public class ExpenseController {
 		return new ResponseEntity<ResponseObject>(obj,HttpStatusUtil.getStatus(obj.getStatusCode()));
 	}
 	
-	@RequestMapping(value= "/listExpense/{userId}", method = RequestMethod.GET)
-	public ResponseEntity<ResponseObject> ListExpense(@PathVariable("userId")String userId) {		
+	@RequestMapping(value= "/listExpense", method = RequestMethod.GET)
+	public ResponseEntity<ResponseObject> ListExpense(@RequestHeader("Authorization") String token) {		
 		
-		ResponseObject obj = expenseService.listAllExpense(userId);
+		ResponseObject obj = expenseService.listAllExpense(token);
 		return new ResponseEntity<ResponseObject>(obj,HttpStatusUtil.getStatus(obj.getStatusCode()));
 	}
 	
-	@RequestMapping(value= "/listCategoryExpense/{userId}/category/{categoryName}", method = RequestMethod.GET)
-	public ResponseEntity<ResponseObject> ListExpenseCategory(@PathVariable("userId")String userId,@PathVariable("categoryName")String categoryName) {		
+	@RequestMapping(value= "/listCategoryExpense/category/{categoryName}", method = RequestMethod.GET)
+	public ResponseEntity<ResponseObject> ListExpenseCategory(@RequestHeader("Authorization") String token,@PathVariable("categoryName")String categoryName) {		
 		
-		ResponseObject obj = expenseService.listExpenseBasedOnCategory(userId, categoryName);
+		ResponseObject obj = expenseService.listExpenseBasedOnCategory(token, categoryName);
 		return new ResponseEntity<ResponseObject>(obj,HttpStatusUtil.getStatus(obj.getStatusCode()));
 	}
 	
-	@RequestMapping(value= "/percentageCategory/{userId}", method = RequestMethod.GET)
-	public ResponseEntity<ResponseObject> percentageCategory(@PathVariable("userId")String userId) {		
+	@RequestMapping(value= "/percentageCategory", method = RequestMethod.GET)
+	public ResponseEntity<ResponseObject> percentageCategory(@RequestHeader("Authorization") String token) {		
 		
-		ResponseObject obj =  expenseService.findPercentageOfCategory(userId);		
+		ResponseObject obj =  expenseService.findPercentageOfCategory(token);		
 		return new ResponseEntity<ResponseObject>(obj,HttpStatusUtil.getStatus(obj.getStatusCode()));
 	}
 
