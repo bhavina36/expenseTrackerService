@@ -16,6 +16,8 @@ public interface CustomerService {
 	String findEmailId(String userId);
 	ResponseObject login(String email, String password);	
 	Optional findByToken(String token);
+	ResponseObject emailExistForgetPassword(String email);
+	ResponseObject changePassword(String email, String newPassword);
 	
 	
 }

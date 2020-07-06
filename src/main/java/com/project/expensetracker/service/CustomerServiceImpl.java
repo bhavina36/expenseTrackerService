@@ -1,6 +1,11 @@
 package com.project.expensetracker.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
@@ -22,8 +27,7 @@ public class CustomerServiceImpl implements CustomerService {
 	private BCryptPasswordEncoder encoder;
 	
 	@Autowired
-	private CustomerRepository userRepo;
-	
+	private CustomerRepository userRepo;	
 	
 	@Override
 	public ResponseObject addUser(Customer user) {
@@ -31,7 +35,9 @@ public class CustomerServiceImpl implements CustomerService {
 		ResponseObject responseObj = new ResponseObject();
 				
 		String email = user.getEmail();	
-		String id = user.getId();		
+		
+		Random random = new Random();
+		String id = "user" + random.nextInt();			
 		
 		responseObj.setMessage("User ID/email already exists");
 		responseObj.setStatusCode(HttpStatus.BAD_REQUEST.value());
@@ -47,6 +53,7 @@ public class CustomerServiceImpl implements CustomerService {
 				System.err.println(encoder.encode(user.getPassword()));
 				
 				user.setPassword(encoder.encode(user.getPassword()));
+				user.setId(id);
 				
 //				String hashedPassword = encoder.encode(user.getPassword());
 //
@@ -59,7 +66,7 @@ public class CustomerServiceImpl implements CustomerService {
 				 
 				responseObj.setMessage("User added successfully");
 				responseObj.setStatusCode(HttpStatus.OK.value());
-				responseObj.setResponse(user.getEmail() +user.getId());
+				responseObj.setResponse(null);
 			}
 			
 		}
@@ -148,6 +155,69 @@ public class CustomerServiceImpl implements CustomerService {
 		return Optional.empty();
 	}
 
+	@Override
+	public ResponseObject emailExistForgetPassword(String email) {
 		
+		ResponseObject responseObj = new ResponseObject();
+		
+		if(email != null) {		
+			Customer checkUserEmail = userRepo.findUserByEmailId(email);
+		
+		  if (checkUserEmail != null) {
+		  
+			  if (checkUserEmail.getEmail().equals(email)) {	
+				  
+				  Map<String,String> map = new HashMap();
+				  map.put("email", checkUserEmail.getEmail());
+				  map.put("securityQuestion", checkUserEmail.getSecurityQuestion());
+				  map.put("securityAnswer", checkUserEmail.getSecurityAnswer());				  
+				  
+			  responseObj.setResponse(map);  
+			  responseObj.setMessage("user exist!");
+			  responseObj.setStatusCode(HttpStatus.OK.value());
+			  
+			  return responseObj;
+			  
+			  } 
+		  }
+		}
+				
+		 responseObj.setResponse(null);  
+		 responseObj.setMessage("Email is not exist!");
+		 responseObj.setStatusCode(HttpStatus.FORBIDDEN.value());
+
+		return responseObj;
+	}	
+	
+	@Override
+	public ResponseObject changePassword(String email, String  newPassword) {
+		
+		ResponseObject responseObj = new ResponseObject();
+		
+		if(email != null) {		
+			Customer user = userRepo.findUserByEmailId(email);
+		
+		  if (user != null) {
+		  
+			  if (user.getEmail().equals(email)) {	
+				  
+				  user.setPassword(encoder.encode(newPassword));			 
+			      userRepo.save(user);	
+			      
+			       
+			      responseObj.setMessage("Successfully password updated!");
+				  responseObj.setStatusCode(HttpStatus.OK.value());
+				  
+				  return responseObj;
+			  }
+			  
+		  }
+		}
+		
+		responseObj.setMessage("Something went wrong!");
+		responseObj.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+		return responseObj;
+	}
+			  
 
 }
