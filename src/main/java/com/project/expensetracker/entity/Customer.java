@@ -15,6 +15,8 @@ public class Customer {
 	private String email;
 	private String password;
 	private String token;
+	private String securityQuestion;
+	private String securityAnswer;
 				
 	public String getId() {
 		return id;
@@ -45,6 +47,18 @@ public class Customer {
 	}
 	public void setToken(String token) {
 		this.token = token;
+	}
+	public String getSecurityQuestion() {
+		return securityQuestion;
+	}
+	public void setSecurityQuestion(String securityQuestion) {
+		this.securityQuestion = securityQuestion;
+	}
+	public String getSecurityAnswer() {
+		return securityAnswer;
+	}
+	public void setSecurityAnswer(String securityAnswer) {
+		this.securityAnswer = securityAnswer;
 	}
 	
 	

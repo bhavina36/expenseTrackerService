@@ -53,5 +53,24 @@ public class CustomerController {
 		
 		return new ResponseEntity<ResponseObject>(obj,HttpStatusUtil.getStatus(obj.getStatusCode()));
 	}
+	
+	@RequestMapping(value = "/forgetpassword", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<ResponseObject> emailExistForgetPassword(@RequestBody Customer user) {
+		
+		ResponseObject obj =  userService.emailExistForgetPassword(user.getEmail());
+		
+		return new ResponseEntity<ResponseObject>(obj,HttpStatusUtil.getStatus(obj.getStatusCode()));
+		
+	}
 
+	@RequestMapping(value = "/changePassword", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<ResponseObject> changePassword(@RequestBody Customer user) {
+		
+		ResponseObject obj =  userService.changePassword(user.getEmail(), user.getPassword());
+		
+		return new ResponseEntity<ResponseObject>(obj,HttpStatusUtil.getStatus(obj.getStatusCode()));
+		
+	}
 }
